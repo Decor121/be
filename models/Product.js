@@ -17,7 +17,8 @@ const ProductSchema = new mongoose.Schema({
   details: { type: String },
   descriptionLong: { type: String },
   characteristics: { type: String },
-  stock: { type: Number, default: 0 }
+  stock: { type: Number, default: 0 },
+  sold: { type: Number, default: 0 }
 });
 
 export default mongoose.model('Product', ProductSchema);

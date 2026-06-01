@@ -7,7 +7,7 @@ const router = express.Router();
 // @desc    Get all products with category filtering and sorting
 router.get('/', async (req, res) => {
   try {
-    const { category, sortBy } = req.query;
+    const { category, sortBy, limit } = req.query;
     
     // Filter building
     let queryFilter = {};
@@ -23,12 +23,19 @@ router.get('/', async (req, res) => {
       sortOptions.price = 1;
     } else if (sortBy === 'priceDesc') {
       sortOptions.price = -1;
+    } else if (sortBy === 'bestSelling') {
+      sortOptions.sold = -1;
     } else {
       // Default to newest
       sortOptions.createdAt = -1;
     }
 
-    const products = await Product.find(queryFilter).sort(sortOptions);
+    let query = Product.find(queryFilter).sort(sortOptions);
+    if (limit) {
+      query = query.limit(parseInt(limit, 10));
+    }
+    
+    const products = await query;
     res.json(products);
   } catch (error) {
     res.status(500).json({ error: error.message });
