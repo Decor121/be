@@ -2,6 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Import custom routes and seed logic
 import authRoutes from './routes/auth.js';
@@ -9,9 +11,14 @@ import productRoutes from './routes/products.js';
 import comboRoutes from './routes/combos.js';
 import cartRoutes from './routes/cart.js';
 import adminRoutes from './routes/admin.js';
+import { seedDatabase } from './seed.js';
+import Category from './models/Category.js';
 
 // Load environment variables
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -20,6 +27,7 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/decor_
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes configuration
 app.use('/api/auth', authRoutes);
@@ -27,6 +35,16 @@ app.use('/api/products', productRoutes);
 app.use('/api/combos', comboRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/admin', adminRoutes);
+
+// GET /api/categories
+app.get('/api/categories', async (req, res) => {
+  try {
+    const categories = await Category.find();
+    res.json(categories);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // Message Schema & Model
 const MessageSchema = new mongoose.Schema({
@@ -109,6 +127,11 @@ mongoose
   .connect(MONGODB_URI)
   .then(async () => {
     console.log('Successfully connected to MongoDB Database.');
+    try {
+      await seedDatabase();
+    } catch (seedErr) {
+      console.error('Failed to run database seed:', seedErr);
+    }
     app.listen(PORT, () => {
       console.log(`Server is listening on port ${PORT}...`);
     });

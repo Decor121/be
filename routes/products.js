@@ -1,5 +1,6 @@
 import express from 'express';
 import Product from '../models/Product.js';
+import Category from '../models/Category.js';
 
 const router = express.Router();
 
@@ -12,7 +13,12 @@ router.get('/', async (req, res) => {
     // Filter building
     let queryFilter = {};
     if (category && category !== 'All') {
-      queryFilter.category = category;
+      const categoryDoc = await Category.findOne({ slug: category });
+      if (categoryDoc) {
+        queryFilter.category = categoryDoc._id;
+      } else {
+        return res.json([]);
+      }
     }
 
     // Sort building
@@ -30,7 +36,7 @@ router.get('/', async (req, res) => {
       sortOptions.createdAt = -1;
     }
 
-    let query = Product.find(queryFilter).sort(sortOptions);
+    let query = Product.find(queryFilter).populate('category').sort(sortOptions);
     if (limit) {
       query = query.limit(parseInt(limit, 10));
     }
@@ -46,7 +52,7 @@ router.get('/', async (req, res) => {
 // @desc    Get single product by ID
 router.get('/:id', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).populate('category');
     if (!product) {
       return res.status(404).json({ error: 'Sản phẩm không tồn tại.' });
     }
