@@ -25,7 +25,7 @@ router.get('/', auth, async (req, res) => {
 // @access  Private
 router.post('/', auth, async (req, res) => {
   try {
-    const { productId, quantity } = req.body;
+    const { productId, quantity, variantName } = req.body;
 
     if (!productId || quantity === undefined) {
       return res.status(400).json({ error: 'Vui lòng cung cấp productId và số lượng.' });
@@ -47,9 +47,9 @@ router.post('/', auth, async (req, res) => {
       return res.status(404).json({ error: 'Không tìm thấy người dùng.' });
     }
 
-    // Check if product is already in cart
+    // Check if product with this specific variant is already in cart
     const itemIndex = user.cart.findIndex(
-      (item) => item.product.toString() === productId
+      (item) => item.product.toString() === productId && (item.variantName || '') === (variantName || '')
     );
 
     if (itemIndex > -1) {
@@ -57,7 +57,7 @@ router.post('/', auth, async (req, res) => {
       user.cart[itemIndex].quantity = qty;
     } else {
       // Add new item to cart
-      user.cart.push({ product: productId, quantity: qty });
+      user.cart.push({ product: productId, variantName: variantName || '', quantity: qty });
     }
 
     await user.save();
@@ -75,14 +75,15 @@ router.post('/', auth, async (req, res) => {
 // @access  Private
 router.delete('/:productId', auth, async (req, res) => {
   try {
+    const { variantName } = req.query;
     const user = await User.findById(req.user);
     if (!user) {
       return res.status(404).json({ error: 'Không tìm thấy người dùng.' });
     }
 
-    // Filter out product from cart
+    // Filter out product variant from cart
     user.cart = user.cart.filter(
-      (item) => item.product.toString() !== req.params.productId
+      (item) => !(item.product.toString() === req.params.productId && (item.variantName || '') === (variantName || ''))
     );
 
     await user.save();

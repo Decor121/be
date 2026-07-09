@@ -7,14 +7,15 @@ const ProductSchema = new mongoose.Schema({
   image: { type: String },
   images: [{ type: String }],
   label: { type: String },
-  price: { type: Number, required: true },
+  price: { type: Number },
   createdAt: { type: Date, default: Date.now },
   code: { type: String, unique: true, index: true },
   color: { type: String },
   colorHex: { type: String },
   colors: [{
     name: { type: String },
-    hex: { type: String }
+    hex: { type: String },
+    stock: { type: Number, default: 0 }
   }],
   dimensions: { type: String },
   material: { type: String },
@@ -28,6 +29,14 @@ const ProductSchema = new mongoose.Schema({
   customFields: [{
     name: { type: String },
     value: { type: String }
+  }],
+  variants: [{
+    name: { type: String, required: true },
+    price: { type: Number, required: true },
+    stock: { type: Number, default: 0 },
+    code: { type: String },
+    dimensions: { type: String },
+    image: { type: String }
   }],
   stock: { type: Number, default: 0 },
   sold: { type: Number, default: 0 }

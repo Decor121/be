@@ -11,7 +11,6 @@ import productRoutes from './routes/products.js';
 import comboRoutes from './routes/combos.js';
 import cartRoutes from './routes/cart.js';
 import adminRoutes from './routes/admin.js';
-import { seedDatabase } from './seed.js';
 import Category from './models/Category.js';
 
 // Load environment variables
@@ -127,11 +126,6 @@ mongoose
   .connect(MONGODB_URI)
   .then(async () => {
     console.log('Successfully connected to MongoDB Database.');
-    try {
-      await seedDatabase();
-    } catch (seedErr) {
-      console.error('Failed to run database seed:', seedErr);
-    }
     app.listen(PORT, () => {
       console.log(`Server is listening on port ${PORT}...`);
     });
@@ -145,3 +139,5 @@ mongoose
       console.log(`Server is listening on port ${PORT} (Database offline)...`);
     });
   });
+
+// Nodemon reload trigger

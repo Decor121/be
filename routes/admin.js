@@ -175,7 +175,8 @@ router.post('/products', auth, isAdmin, async (req, res) => {
       careInstructions,
       customFields,
       images,
-      colors
+      colors,
+      variants
     } = req.body;
 
     // Simple validation
@@ -233,6 +234,7 @@ router.post('/products', auth, isAdmin, async (req, res) => {
       color: primaryColor.name,
       colorHex: primaryColor.hex,
       colors: colors || [],
+      variants: variants || [],
       dimensions,
       weight,
       style,
@@ -273,7 +275,8 @@ router.put('/products/:id', auth, isAdmin, async (req, res) => {
       careInstructions,
       customFields,
       images,
-      colors
+      colors,
+      variants
     } = req.body;
 
     // Simple validation
@@ -335,6 +338,7 @@ router.put('/products/:id', auth, isAdmin, async (req, res) => {
     product.color = primaryColor.name;
     product.colorHex = primaryColor.hex;
     product.colors = colors || [];
+    product.variants = variants || [];
     product.dimensions = dimensions;
     product.weight = weight;
     product.style = style;
