@@ -11,6 +11,7 @@ import productRoutes from './routes/products.js';
 import comboRoutes from './routes/combos.js';
 import cartRoutes from './routes/cart.js';
 import adminRoutes from './routes/admin.js';
+import chatRoutes from './routes/chat.js';
 import Category from './models/Category.js';
 
 // Load environment variables
@@ -34,6 +35,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/combos', comboRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/chat', chatRoutes);
 
 // GET /api/categories
 app.get('/api/categories', async (req, res) => {
